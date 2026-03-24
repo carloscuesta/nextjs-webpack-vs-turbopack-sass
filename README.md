@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# nextjs-webpack-vs-turbopack-sass
 
-## Getting Started
+Hey! 👋🏼
 
-First, run the development server:
+This a reproduction repository for showcasing Next.js Turbopack vs Webpack rounding precision difference when compiling Sass. 
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Steps to reproduce
+
+1. Build the project using Webpack:
+
+```sh
+npm run build:webpack
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Copy generated CSS into a `webpack.css` file:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```sh
+find .next -name '*.css' -exec cat {} + > ./webpack.css
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. Build the project using Turbopack:
 
-## Learn More
+```sh
+npm run build:turbopack
+```
 
-To learn more about Next.js, take a look at the following resources:
+4. Copy generated CSS into a `turbopack.css` file:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```sh
+find .next -name '*.css' -exec cat {} + > ./turbopack.css
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+5. Do a `diff` of both files (look at `line-height` property):
 
-## Deploy on Vercel
+- Webpack `line-height`: `1.4705882353` (10 digits of precision)
+- Turbopack `line-height`: `1.47059` (5 digits of precision)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```sh
+diff webpack.css turbopack.css
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Visual reproduction
+
+You can also reproduce it by building and opening the project in two separate tabs:
+
+1. Build with webpack and start the server:
+
+```sh
+npm run build:webpack && npm run start -- -p 3001
+```
+
+2. Open http://localhost:3001 in a Safari
+3. Stop the server (without closing browser tab)
+4. Build with turbopack and start the server:
+
+```sh
+npm run build:turbopack && npm run start -- -p 3002
+```
+
+5. Open http://localhost:3002 in Safari
+6. Compare both tabs
+
+https://github.com/user-attachments/assets/2bf93c06-f5a4-4c4d-b6f1-e953a269b29a
