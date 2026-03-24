@@ -21,5 +21,6 @@
     "babel-plugin-react-compiler": "1.0.0",
     "sass": "1.98.0",
     "typescript": "^5"
-  }
+  },
+  "packageManager": "npm@11.6.2"
 }
